@@ -43,10 +43,14 @@ const normalizePokemon = async (pokemon) => {
 }
 
 const savePokemonToNotion = async (pokemon) => {
-    console.log(pokemon);
-
     await notion.pages.create({
         parent: { database_id: process.env.DATABASE_ID },
+        icon: {
+            type: 'external',
+            external: {
+                url: pokemon.image
+            }
+        },
         properties: {
             title: {
                 title: [
@@ -86,12 +90,14 @@ const savePokemonToNotion = async (pokemon) => {
 
 const run = async () => {
 
-    for (let i = 1; i < 906; i++) {
+    for (let i = 899; i < 906; i++) {
         const { data: pokemon } = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
 
         const normalizedPokemon = await normalizePokemon(pokemon);
 
         savePokemonToNotion(normalizedPokemon);
+
+        console.info(normalizedPokemon.id, normalizedPokemon.name);
 
         // notion runs into some saving errors without a wait in between
         await sleep(100);
